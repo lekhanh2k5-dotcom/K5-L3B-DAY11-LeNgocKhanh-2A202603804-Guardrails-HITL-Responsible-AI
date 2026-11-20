@@ -1,5 +1,11 @@
 # Day 11 — Controlled Agent Security (2026)
 
+> **Học viên:** Lê Ngọc Khánh · **MSSV:** 2A202603804 · **Lớp:** L3B
+>
+> **Cách chạy:** tạo venv → `pip install -r requirements.txt` → điền `.env` (OpenRouter cho Blue, Gemini `gemini-3.5-flash` cho Red) →
+> `python src/main.py --part 3` (sinh `outputs/results.json`) → `python src/main.py --part 4` (sinh `outputs/attack_results.json`) →
+> `python scripts/grade.py --submission-dir . --out outputs/grade_report.json`.
+
 > 👤 **Hình thức:** bài tập **cá nhân** (1 người / 1 MSSV).  
 > 🎯 **Mục tiêu:** đóng vai **Blue Team** để học cách xây Guardrails phòng thủ, rồi đóng vai **Red Team** để tấn công agent **Red** hoặc **Red Advance**.  
 > ✅ Làm theo **Checkpoint 1 → 5** trong [`CHECKPOINTS.md`](CHECKPOINTS.md) · nộp theo [`SUBMISSION.md`](SUBMISSION.md).
