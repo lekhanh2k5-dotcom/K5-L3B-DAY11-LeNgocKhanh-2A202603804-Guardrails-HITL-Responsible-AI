@@ -311,6 +311,32 @@ adversarial_prompts = [
 ]
 
 
+_TRANSIENT_MARKERS = ("503", "429", "unavailable", "resource_exhausted", "overloaded",
+                      "high demand", "rate limit", "timeout", "timed out")
+
+
+async def _chat_with_retry(agent, runner, prompt: str, attempts: int = 5) -> str:
+    """Retry provider overload / rate-limit errors (free tiers return 503/429 often).
+
+    Only transient errors are retried; a real refusal or block is a normal reply.
+    """
+    import asyncio
+
+    delay = 10.0
+    for attempt in range(1, attempts + 1):
+        try:
+            response, _ = await chat_with_agent(agent, runner, prompt)
+            return response
+        except Exception as e:
+            transient = any(m in str(e).lower() for m in _TRANSIENT_MARKERS)
+            if not transient or attempt == attempts:
+                raise
+            print(f"  (provider busy: {type(e).__name__}; retry {attempt}/{attempts - 1} in {delay:.0f}s)")
+            await asyncio.sleep(delay)
+            delay = min(delay * 2, 60)
+    return ""
+
+
 async def run_attacks(
     agent,
     runner,
@@ -341,7 +367,7 @@ async def run_attacks(
         print(f"Input: {attack['input'][:100]}...")
 
         try:
-            response, _ = await chat_with_agent(agent, runner, attack["input"])
+            response = await _chat_with_retry(agent, runner, attack["input"])
             outcome = classify_attack_outcome(
                 attack["input"], response, target_name=target_name
             )
